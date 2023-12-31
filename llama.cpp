@@ -4345,20 +4345,43 @@ struct llm_build_context {
 
 // IRL LOOK HERE
 
-//#define n_chunks 4
-//double chunks[n_chunks][2] = { {0.0,0.4}, {0.2,0.6}, {0.4,0.8}, {0.6,1.0} };
+// Layers are specifed in the environment variable $LLAMA_CHUNKS as a string of floats of the form:
+// "first_chunk_begin, first_chunk_end, 2nd_chunk_begin, 2nd_chunk_end, ..."
+// e.g.,
+// export LLAMA_CHUNKS="0.0,0.6,0.2,0.8,0.6,1.0"
+// creates a Frankenmodel that has the first 60% of the model layers, followed by a block starting
+// at the layer 20% through, and ending at the layer 80% of the way through, and then a final block
+// from 60% to 100%.
+//
+// Note layers are always addressed as a fraction of the number of layers in the model (0.0 - 1.0).
 
-#define n_chunks 8
-double chunks[n_chunks][2] = { {0.0,0.2}, {0.1,0.3}, {0.2,0.4}, {0.3,0.5}, {0.4,0.6}, {0.5,0.7}, {0.6,0.8}, {0.6,1.0} };
+#define max_chunks 1024
+double chunks[max_chunks][2];
+int n_chunks = 0;
 
-// #define n_chunks 15
-// double chunks[n_chunks][2] = {
-//     {0.00, 0.20}, {0.10, 0.30}, {0.15, 0.35}, 
-//     {0.20, 0.40}, {0.25, 0.45}, {0.30, 0.50}, {0.35, 0.55},
-//     {0.40, 0.60}, {0.45, 0.65}, {0.50, 0.70}, {0.55, 0.75},
-//     {0.60, 0.80}, {0.65, 0.85}, {0.70, 0.90},
-//     {0.80, 1.00}
-// };
+char *chunk_var= std::getenv("LLAMA_CHUNKS");
+char *env_chunks = strdup(chunk_var);
+
+
+if (env_chunks != NULL) {
+    char *token1 = strtok(env_chunks, ",");
+    char *token2 = strtok(NULL, ",");
+    while (token2 != NULL) {
+        chunks[n_chunks][0] = atof(token1);
+        chunks[n_chunks][1] = atof(token2);
+        n_chunks++;
+        token1 = strtok(NULL, ",");
+        token2 = strtok(NULL, ",");
+    }
+
+}
+else { 
+    n_chunks = 1;
+    chunks[0][0] = 0.0;
+    chunks[0][1] = 1.0; 
+}
+
+//for(int i=0; i<n_chunks;i++) printf("%d: (%f, %f)\n", i, chunks[i][0], chunks[i][1]);
 
 for(int nc=0;nc<n_chunks;nc++) {
         //printf("%d: (%d,%d)\n",nc,int(chunks[nc][0]*n_layer),int(chunks[nc][1]*n_layer));
@@ -4506,7 +4529,7 @@ for(int nc=0;nc<n_chunks;nc++) {
             // input for next layer
             inpL = cur;
         }
-        } // Chunkblock
+} // end hacked up IRL loop
 
 
 
