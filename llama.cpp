@@ -4344,27 +4344,25 @@ struct llm_build_context {
         }
 
 // IRL LOOK HERE
-#define n_chunks 4
-//double chunks[n_chunks][2] = { {0.0,0.4}, {0.4,0.6}, {0.5,0.7}, {0.7,1.0} };
-double chunks[n_chunks][2] = { {0.0,0.4}, {0.2,0.6}, {0.4,0.8}, {0.6,1.0} };
 
-// #define n_chunks 8
-// double chunks[n_chunks][2] = { {0.0,0.2}, {0.1,0.3}, {0.2,0.4}, {0.3,0.5}, {0.4,0.6}, {0.5,0.7}, {0.6,0.8}, {0.6,1.0} };
+//#define n_chunks 4
+//double chunks[n_chunks][2] = { {0.0,0.4}, {0.2,0.6}, {0.4,0.8}, {0.6,1.0} };
 
-//#define n_chunks 9
-//double chunks[n_chunks][2] = { {0.0,0.2}, {0.1,0.3}, {0.2,0.4}, {0.3,0.5}, {0.4,0.6}, {0.5,0.7}, {0.6,0.8}, {0.7,0.9}, {0.8,1.0} };
+#define n_chunks 8
+double chunks[n_chunks][2] = { {0.0,0.2}, {0.1,0.3}, {0.2,0.4}, {0.3,0.5}, {0.4,0.6}, {0.5,0.7}, {0.6,0.8}, {0.6,1.0} };
 
+// #define n_chunks 15
+// double chunks[n_chunks][2] = {
+//     {0.00, 0.20}, {0.10, 0.30}, {0.15, 0.35}, 
+//     {0.20, 0.40}, {0.25, 0.45}, {0.30, 0.50}, {0.35, 0.55},
+//     {0.40, 0.60}, {0.45, 0.65}, {0.50, 0.70}, {0.55, 0.75},
+//     {0.60, 0.80}, {0.65, 0.85}, {0.70, 0.90},
+//     {0.80, 1.00}
+// };
 
 for(int nc=0;nc<n_chunks;nc++) {
-
+        //printf("%d: (%d,%d)\n",nc,int(chunks[nc][0]*n_layer),int(chunks[nc][1]*n_layer));
         for (int il = int(chunks[nc][0]*n_layer); il < int(chunks[nc][1]*n_layer); ++il) {
-
-// int layer_expand = 1;
-// if (il>int(n_layer*0.1) && il<int(n_layer*0.9))
-//     layer_expand = 2;
-// //printf("il = %d, LE = %d\n", il, layer_expand);
-
-// for(int fakeblock=0; fakeblock<layer_expand; fakeblock++) {
 
             struct ggml_tensor * inpSA = inpL;
 
